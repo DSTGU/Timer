@@ -88,7 +88,7 @@ export default function TimerScreen() {
     >
       <Text style={styles.mainText}>{formatTime(time)}</Text>
 
-      <AveragesBox />
+      <AveragesBox update={pressed} />
     </Pressable>
   );
 }

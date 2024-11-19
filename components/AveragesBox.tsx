@@ -4,17 +4,21 @@ import { calculateAverage, calculateMean, formatTime } from "@/utils/calc";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 
-const AveragesBox = () => {
-  const [times, setTimes] = useState<[number]>([0]);
+type propsType = {
+  update: boolean;
+};
+
+const AveragesBox = (props: propsType) => {
+  const [times, setTimes] = useState<Array<number>>([]);
   useEffect(() => {
     getItem("times").then((res) => setTimes(res));
-  });
+  }, [props.update]);
 
   return (
     <View>
       <Text style={styles.text}>
-        {" "}
-        Average: {formatTime(calculateMean(times, 5))}{" "}
+        Average:
+        {formatTime(calculateMean(times, 5))}
       </Text>
     </View>
   );

@@ -2,9 +2,14 @@ export const calculateAverage = (times: [number], num: number) => {
 
 }
 
-export const calculateMean = (times: [number], num: number) => {
+export const calculateMean = (times: Array<number>, num: number) => {
+  
+  if (times.length == 0) {
+    return NaN;
+  }
+  
   const rel = times.slice(-num);  
-  return rel.reduce((a,b) => a+b)/num;
+  return rel.reduce((a,b) => a+b)/rel.length;
 }
 
 export const formatTime = (time: number) => {

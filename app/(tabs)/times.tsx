@@ -24,7 +24,7 @@ const AboutScreen = (navigation: any) => {
     <View style={styles.container}>
       <FlatList
         style={styles.flatList}
-        data={times}
+        data={times.reverse()}
         contentContainerStyle={{ flexDirection: "column", gap: 5 }}
         numColumns={3}
         showsVerticalScrollIndicator={false}
