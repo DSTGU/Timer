@@ -2,13 +2,15 @@ import { StyleSheet } from "react-native";
 
 export const colors = {
     primary : "#7a00d1",
-    primaryPressed: "#9603ff",
+    primaryLight: "#9603ff",
+    primaryDark: "#b623ff",
+    text: "#fff"
 }
 
 export const styles = StyleSheet.create({
     containerPressed: {
       flex: 1,
-      backgroundColor: colors.primaryPressed,
+      backgroundColor: colors.primaryLight,
       justifyContent: 'center',
       alignItems: 'center',
     },  
@@ -18,8 +20,29 @@ export const styles = StyleSheet.create({
       justifyContent: 'center',
       alignItems: 'center',
     },
-    text: {
-      color: '#fff',
-    },
+  flatList: {
+    backgroundColor: colors.primary,
+    height: "100%",
+    alignSelf: "center"
+  },
+  text: {
+    color: '#fff',
+    userSelect: "none"
+  },
+  mainText: {
+    color: colors.text,
+    userSelect: "none",
+    fontSize: 72,
+  },
+  timePill: {
+    color: colors.text,
+    borderRadius: 16,
+    borderColor: colors.primaryLight,
+    backgroundColor: colors.primaryLight,
+    padding: 20,
+    margin: 10,
+  }
+
+
   });
   

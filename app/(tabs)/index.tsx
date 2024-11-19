@@ -1,32 +1,26 @@
 import { Text, View, StyleSheet, Pressable } from "react-native";
 import { styles } from "@/styles";
 import { useEffect, useState } from "react";
+import { getItem, removeItem, setItem } from "@/utils/asyncStorage";
+import { formatTime } from "@/utils/calc";
+import AveragesBox from "@/components/AveragesBox";
 
 const UPDATE_DELAY = 17;
 
-const zeroPad = (num: number, length: number) => {
-  let str = num.toString();
+const saveTime = async (time: number) => {
+  console.log("times:");
+  const times = await getItem("times");
 
-  while (str.length < length) {
-    str = "0" + str;
-  }
-  return str;
-};
+  if (!times) {
+    const timeItem = [];
+    timeItem.push(Math.floor(time / 10));
 
-const formatTime = (time: number) => {
-  let str = "";
-
-  if (time > 60000) {
-    //minutes
-    str += Math.floor(time / 60000) + ":";
+    await setItem("times", timeItem);
+    return;
   }
 
-  str +=
-    zeroPad(Math.floor((time % 60000) / 1000), 2) +
-    "." +
-    zeroPad(Math.floor((time % 1000) / 10), 2);
-
-  return str;
+  times.push(time);
+  await setItem("times", times);
 };
 
 export default function TimerScreen() {
@@ -35,6 +29,7 @@ export default function TimerScreen() {
   const [time, setTime] = useState(0);
   const [running, setRunning] = useState(false);
   const [pressed, setPressed] = useState(false);
+  const [averages, setAverages] = useState([0]);
 
   useEffect(() => {
     let interval: any;
@@ -53,6 +48,21 @@ export default function TimerScreen() {
     return () => clearInterval(interval);
   }, [startTime, running]);
 
+  const updateAverages = async () => {
+    const times = await getItem("times");
+    if (!times) {
+      setAverages([]);
+      return;
+    }
+
+    setAverages([
+      times.reduce(
+        (sum: number, currentValue: number) => sum + currentValue,
+        0
+      ) / times.length,
+    ]);
+  };
+
   return (
     <Pressable
       onPressIn={() => {
@@ -60,6 +70,8 @@ export default function TimerScreen() {
         if (running) {
           setRunning(false);
           setHoldIgnore(true);
+          saveTime(time);
+          updateAverages();
         }
       }}
       onPressOut={() => {
@@ -74,7 +86,9 @@ export default function TimerScreen() {
       }}
       style={pressed ? styles.containerPressed : styles.container}
     >
-      <Text style={styles.text}>{formatTime(time)}</Text>
+      <Text style={styles.mainText}>{formatTime(time)}</Text>
+
+      <AveragesBox />
     </Pressable>
   );
 }

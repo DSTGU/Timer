@@ -1,11 +1,39 @@
-import { styles } from '@/styles';
-import { Text, View, StyleSheet } from 'react-native';
+import { TimePill } from "@/components/TimePill";
+import { styles } from "@/styles";
+import { getItem } from "@/utils/asyncStorage";
+import { useEffect, useState } from "react";
+import { FlatList } from "react-native";
+import { View } from "react-native";
 
-export default function AboutScreen() {
+type propsType = {
+  navigation: any;
+};
+
+const AboutScreen = (navigation: any) => {
+  const [times, setTimes] = useState([]);
+
+  //setTimes(getItem())
+
+  useEffect(() => {
+    getItem("times").then((res) => {
+      setTimes(res);
+    });
+  }, [navigation]);
+
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>About screen</Text>
+      <FlatList
+        style={styles.flatList}
+        data={times}
+        contentContainerStyle={{ flexDirection: "column", gap: 5 }}
+        numColumns={3}
+        showsVerticalScrollIndicator={false}
+        renderItem={({ item }) => {
+          return <TimePill time={item} />;
+        }}
+      ></FlatList>
     </View>
   );
-}
+};
 
+export default AboutScreen;
