@@ -1,8 +1,8 @@
 import { TimePill } from "@/components/TimePill";
 import { styles } from "@/styles";
-import { getItem } from "@/utils/asyncStorage";
+import { getItem, setItem } from "@/utils/asyncStorage";
 import { useEffect, useState } from "react";
-import { FlatList } from "react-native";
+import { FlatList, Pressable, Text } from "react-native";
 import { View } from "react-native";
 
 type propsType = {
@@ -18,7 +18,7 @@ const AboutScreen = (navigation: any) => {
     getItem("times").then((res) => {
       setTimes(res);
     });
-  }, [navigation]);
+  });
 
   return (
     <View style={styles.container}>
@@ -32,6 +32,10 @@ const AboutScreen = (navigation: any) => {
           return <TimePill time={item} />;
         }}
       ></FlatList>
+
+      <Pressable style={styles.timePill} onPress={() => setItem("times", [])}>
+        <Text style={styles.text}> DeleteTimes </Text>
+      </Pressable>
     </View>
   );
 };

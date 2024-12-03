@@ -7,6 +7,22 @@ import AveragesBox from "@/components/AveragesBox";
 
 const UPDATE_DELAY = 17;
 
+const saveTime = async (time: number) => {
+  const times = await getItem("times");
+
+  console.log("Saving:", time);
+  if (!times) {
+    const timeItem = [];
+    timeItem.push(Math.floor(time / 10));
+
+    await setItem("times", timeItem);
+    return;
+  }
+
+  times.push(time);
+  await setItem("times", times);
+};
+
 export default function TimerScreen() {
   const [holdIgnore, setHoldIgnore] = useState(false);
   const [startTime, setStartTime] = useState(Date.now());
@@ -16,22 +32,6 @@ export default function TimerScreen() {
   const [scramble, setScramble] = useState("abcd");
   const firstUpdate = useRef(true);
 
-  const saveTime = async () => {
-    const times = await getItem("times");
-
-    console.log(time);
-    if (!times) {
-      const timeItem = [];
-      timeItem.push(Math.floor(time / 10));
-
-      await setItem("times", timeItem);
-      return;
-    }
-
-    times.push(time);
-    await setItem("times", times);
-  };
-
   useEffect(() => {
     if (firstUpdate.current) {
       firstUpdate.current = false;
@@ -39,21 +39,16 @@ export default function TimerScreen() {
     }
 
     let interval: any;
-    console.log("doing");
     if (running) {
       interval = setInterval(() => {
         setTime(Date.now() - startTime);
       }, UPDATE_DELAY);
-      console.log("running");
-      setStartTime(Date.now());
 
       // randomScrambleForEvent("333").then((res) => {
       //   setScramble(res.toString());
       // });
     } else {
       clearInterval(interval);
-      setTime(Date.now() - startTime);
-      saveTime();
     }
 
     return () => clearInterval(interval);
@@ -66,6 +61,9 @@ export default function TimerScreen() {
         if (running) {
           setRunning(false);
           setHoldIgnore(true);
+          const time = Date.now() - startTime;
+          setTime(time);
+          saveTime(time);
         }
       }}
       onPressOut={() => {
@@ -74,6 +72,7 @@ export default function TimerScreen() {
           if (holdIgnore) {
             setHoldIgnore(false);
           } else {
+            setStartTime(Date.now());
             setRunning(true);
           }
         }
