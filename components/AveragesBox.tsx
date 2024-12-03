@@ -15,11 +15,15 @@ const AveragesBox = (props: propsType) => {
   }, [props.update]);
 
   return (
-    <View>
-      <Text style={styles.text}>
-        Average:
-        {formatTime(calculateMean(times, 5))}
-      </Text>
+    <View style={styles.box}>
+      <View style={{ flex: 1, alignItems: "center", gap: 7 }}>
+        <Text style={styles.text}>Ao5:</Text>
+        <Text style={styles.text}>{formatTime(calculateMean(times, 5))}</Text>
+      </View>
+      <View style={{ flex: 1, alignItems: "center", gap: 7 }}>
+        <Text style={styles.text}>Ao12:</Text>
+        <Text style={styles.text}>{formatTime(calculateMean(times, 12))}</Text>
+      </View>
     </View>
   );
 };

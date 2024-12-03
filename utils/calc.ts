@@ -1,10 +1,18 @@
-export const calculateAverage = (times: [number], num: number) => {
+export const calculateAverage = (times: Array<number>, num: number) => {
+  if (!times || times.length < num) {
+    return NaN;
+  }
 
+  const rel = times.slice(-num);  
+
+  console.log("rel:", rel);
+
+  return calculateMean(rel, 3);
 }
 
 export const calculateMean = (times: Array<number>, num: number) => {
   
-  if (times.length == 0) {
+  if (!times || times.length < num) {
     return NaN;
   }
   
@@ -13,6 +21,10 @@ export const calculateMean = (times: Array<number>, num: number) => {
 }
 
 export const formatTime = (time: number) => {
+  if (Number.isNaN(time)) {
+    return "--";
+  }
+  
   let str = "";
   
   if (time > 60000) {

@@ -1,27 +1,11 @@
 import { Text, View, StyleSheet, Pressable } from "react-native";
 import { styles } from "@/styles";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getItem, removeItem, setItem } from "@/utils/asyncStorage";
 import { formatTime } from "@/utils/calc";
 import AveragesBox from "@/components/AveragesBox";
 
 const UPDATE_DELAY = 17;
-
-const saveTime = async (time: number) => {
-  console.log("times:");
-  const times = await getItem("times");
-
-  if (!times) {
-    const timeItem = [];
-    timeItem.push(Math.floor(time / 10));
-
-    await setItem("times", timeItem);
-    return;
-  }
-
-  times.push(time);
-  await setItem("times", times);
-};
 
 export default function TimerScreen() {
   const [holdIgnore, setHoldIgnore] = useState(false);
@@ -29,39 +13,51 @@ export default function TimerScreen() {
   const [time, setTime] = useState(0);
   const [running, setRunning] = useState(false);
   const [pressed, setPressed] = useState(false);
-  const [averages, setAverages] = useState([0]);
+  const [scramble, setScramble] = useState("abcd");
+  const firstUpdate = useRef(true);
+
+  const saveTime = async () => {
+    const times = await getItem("times");
+
+    console.log(time);
+    if (!times) {
+      const timeItem = [];
+      timeItem.push(Math.floor(time / 10));
+
+      await setItem("times", timeItem);
+      return;
+    }
+
+    times.push(time);
+    await setItem("times", times);
+  };
 
   useEffect(() => {
-    let interval: any;
+    if (firstUpdate.current) {
+      firstUpdate.current = false;
+      return;
+    }
 
+    let interval: any;
+    console.log("doing");
     if (running) {
       interval = setInterval(() => {
         setTime(Date.now() - startTime);
       }, UPDATE_DELAY);
-
+      console.log("running");
       setStartTime(Date.now());
+
+      // randomScrambleForEvent("333").then((res) => {
+      //   setScramble(res.toString());
+      // });
     } else {
       clearInterval(interval);
       setTime(Date.now() - startTime);
+      saveTime();
     }
 
     return () => clearInterval(interval);
   }, [startTime, running]);
-
-  const updateAverages = async () => {
-    const times = await getItem("times");
-    if (!times) {
-      setAverages([]);
-      return;
-    }
-
-    setAverages([
-      times.reduce(
-        (sum: number, currentValue: number) => sum + currentValue,
-        0
-      ) / times.length,
-    ]);
-  };
 
   return (
     <Pressable
@@ -70,8 +66,6 @@ export default function TimerScreen() {
         if (running) {
           setRunning(false);
           setHoldIgnore(true);
-          saveTime(time);
-          updateAverages();
         }
       }}
       onPressOut={() => {
@@ -84,11 +78,22 @@ export default function TimerScreen() {
           }
         }
       }}
-      style={pressed ? styles.containerPressed : styles.container}
+      style={
+        running
+          ? styles.containerRunning
+          : pressed
+          ? styles.containerPressed
+          : styles.container
+      }
     >
+      {!running && (
+        <View style={styles.box}>
+          <Text style={styles.text}> {scramble} </Text>
+        </View>
+      )}
       <Text style={styles.mainText}>{formatTime(time)}</Text>
 
-      <AveragesBox update={pressed} />
+      {!running && <AveragesBox update={pressed} />}
     </Pressable>
   );
 }
